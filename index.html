@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>asmobbin — Find a place to stay</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── Navbar ────────────────────────────────────────── -->
+<nav class="navbar">
+  <!-- Logo -->
+  <a class="logo" href="#">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 1C9.925 1 5 7.29 5 15.18c0 5.37 2.67 10.1 6.73 12.82L16 31l4.27-3c4.06-2.72 6.73-7.45 6.73-12.82C27 7.29 22.075 1 16 1zm0 21a6 6 0 110-12 6 6 0 010 12z"/>
+    </svg>
+    <span>asmobbin</span>
+  </a>
+
+  <!-- Nav tabs -->
+  <div class="nav-tabs">
+    <a class="nav-tab active" href="#">
+      <span class="nav-tab-icon">🏠</span>
+      <span>Homes</span>
+    </a>
+    <a class="nav-tab" href="#">
+      <span class="nav-tab-badge">NEW</span>
+      <span class="nav-tab-icon">🎈</span>
+      <span>Experiences</span>
+    </a>
+    <a class="nav-tab" href="#">
+      <span class="nav-tab-badge">NEW</span>
+      <span class="nav-tab-icon">🛎️</span>
+      <span>Services</span>
+    </a>
+  </div>
+
+  <!-- Right side -->
+  <div class="nav-right">
+    <a class="become-host" href="#">Become a host</a>
+    <button class="nav-icon-btn" title="Language">🌐</button>
+    <div class="user-menu" role="button" tabindex="0">
+      <span class="user-menu-icon">☰</span>
+      <div class="user-avatar">👤</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Search Bar ─────────────────────────────────────── -->
+<section class="search-section">
+  <div class="search-bar">
+    <div class="search-field">
+      <label for="where">Where</label>
+      <input id="where" type="text" placeholder="Search destinations" />
+    </div>
+    <div class="search-divider"></div>
+    <div class="search-field">
+      <label for="checkin">Check in</label>
+      <input id="checkin" type="text" placeholder="Add dates" />
+    </div>
+    <div class="search-divider"></div>
+    <div class="search-field">
+      <label for="checkout">Check out</label>
+      <input id="checkout" type="text" placeholder="Add dates" />
+    </div>
+    <div class="search-divider"></div>
+    <div class="search-field">
+      <label for="who">Who</label>
+      <input id="who" type="text" placeholder="Add guests" />
+    </div>
+    <button class="search-btn" aria-label="Search">🔍</button>
+  </div>
+</section>
+
+<!-- ── Listings ──────────────────────────────────────── -->
+<main id="listings"></main>
+
+<!-- ── Footer ───────────────────────────────────────── -->
+<footer>
+  <span>© 2026 asmobbin, Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Sitemap</a></span>
+  <span><a href="#">English (US)</a> · <a href="#">USD</a> · <a href="#">Support &amp; resources</a></span>
+</footer>
+
+<!-- ── Price tooltip ─────────────────────────────────── -->
+<div class="price-tooltip" id="priceTooltip">
+  <span class="price-tooltip-icon">🏷️</span>
+  <span>Prices include all fees</span>
+</div>
+
+<script>
+  // ── Data ──────────────────────────────────────────────
+  const CITIES = [
+    {
+      title: 'Popular homes in Philadelphia',
+      listings: [
+        { name: 'Apartment in Center City',     price: 240, nights: 2, rating: 4.93, img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&q=80' },
+        { name: 'Place to stay in Center City', price: 103, nights: 2, rating: 4.84, img: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&q=80' },
+        { name: 'Place to stay in Philadelphia',price: 228, nights: 2, rating: 4.89, img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80' },
+        { name: 'Apartment in Point Breeze',    price: 234, nights: 2, rating: 4.85, img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=80' },
+        { name: 'Room in West Philadelphia',    price: 123, nights: 2, rating: 4.91, img: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&q=80' },
+        { name: 'Condo in Center City',         price: 371, nights: 2, rating: 4.99, img: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&q=80' },
+        { name: 'Room in Fishtown',             price: 159, nights: 2, rating: 4.91, img: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&q=80' },
+      ]
+    },
+    {
+      title: 'Available next month in Miami',
+      listings: [
+        { name: 'Apartment in Miami',        price: 381, nights: 2, rating: 5.0,  img: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=80' },
+        { name: 'Room in Miami',             price: 112, nights: 2, rating: 4.99, img: 'https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=400&q=80' },
+        { name: 'Room in Miami',             price: 107, nights: 2, rating: 4.96, img: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=400&q=80' },
+        { name: 'Room in Miami',             price: 137, nights: 2, rating: 5.0,  img: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400&q=80' },
+        { name: 'Apartment in Miami',        price: 588, nights: 2, rating: 4.88, img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80' },
+        { name: 'Room in Miami',             price: 228, nights: 2, rating: 4.88, img: 'https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=400&q=80' },
+        { name: 'Apartment in Coral Gables', price: 228, nights: 2, rating: 4.97, img: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=400&q=80' },
+      ]
+    },
+    {
+      title: 'Stay in San Juan',
+      listings: [
+        { name: 'Beach House in Condado',    price: 310, nights: 2, rating: 4.95, img: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&q=80' },
+        { name: 'Apartment in Old San Juan', price: 145, nights: 2, rating: 4.87, img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80' },
+        { name: 'Villa in Isla Verde',       price: 450, nights: 2, rating: 4.98, img: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=80' },
+        { name: 'Studio in Miramar',         price: 98,  nights: 2, rating: 4.82, img: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=400&q=80' },
+        { name: 'Condo in San Juan',         price: 275, nights: 2, rating: 4.93, img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&q=80' },
+        { name: 'Room in Santurce',          price: 88,  nights: 2, rating: 4.79, img: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=400&q=80' },
+        { name: 'House in Ocean Park',       price: 390, nights: 2, rating: 5.0,  img: 'https://images.unsplash.com/photo-1601918774946-25832a4be0d6?w=400&q=80' },
+      ]
+    }
+  ];
+
+  // ── Render ────────────────────────────────────────────
+  const main = document.getElementById('listings');
+
+  CITIES.forEach((city, ci) => {
+    const trackId  = `track-${ci}`;
+    const totalCards = city.listings.length;
+
+    const section = document.createElement('section');
+    section.className = 'listings-section';
+    section.innerHTML = `
+      <div class="section-header">
+        <a href="#" class="section-title">${city.title} ›</a>
+        <div class="scroll-btns">
+          <button class="scroll-btn" id="prev-${ci}" disabled aria-label="Previous">‹</button>
+          <button class="scroll-btn" id="next-${ci}" aria-label="Next">›</button>
+        </div>
+      </div>
+      <div class="cards-wrapper" id="wrapper-${ci}">
+        <div class="cards-track" id="${trackId}">
+          ${city.listings.map((l, li) => `
+            <div class="card">
+              <div class="card-image-wrap">
+                <img src="${l.img}" alt="${l.name}" loading="lazy" />
+                <span class="card-badge">Guest favorite</span>
+                <button class="card-heart" data-ci="${ci}" data-li="${li}" aria-label="Save to wishlist">♡</button>
+              </div>
+              <div class="card-info">
+                <div class="card-name">${l.name}</div>
+                <div class="card-meta">
+                  <span class="card-price">$${l.price} for ${l.nights} nights</span>
+                  <span class="card-rating"><span class="star">★</span>${l.rating}</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    main.appendChild(section);
+
+    // Scroll logic
+    let offset = 0;
+    const prevBtn = section.querySelector(`#prev-${ci}`);
+    const nextBtn = section.querySelector(`#next-${ci}`);
+    const track   = section.querySelector(`#${trackId}`);
+
+    function getStep() {
+      const wrapper = section.querySelector(`#wrapper-${ci}`);
+      const card    = track.querySelector('.card');
+      if (!card) return 0;
+      return (card.offsetWidth + 16) * 3; // scroll 3 cards at a time
+    }
+
+    function maxOffset() {
+      const wrapper  = section.querySelector(`#wrapper-${ci}`);
+      return track.scrollWidth - wrapper.offsetWidth;
+    }
+
+    function updateBtns() {
+      prevBtn.disabled = offset <= 0;
+      nextBtn.disabled = offset >= maxOffset();
+    }
+
+    nextBtn.addEventListener('click', () => {
+      offset = Math.min(offset + getStep(), maxOffset());
+      track.style.transform = `translateX(-${offset}px)`;
+      updateBtns();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      offset = Math.max(offset - getStep(), 0);
+      track.style.transform = `translateX(-${offset}px)`;
+      updateBtns();
+    });
+  });
+
+  // Heart toggle
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('card-heart')) {
+      e.target.classList.toggle('liked');
+      e.target.textContent = e.target.classList.contains('liked') ? '♥' : '♡';
+    }
+  });
+
+  // Auto-hide price tooltip after 4 s
+  setTimeout(() => {
+    const t = document.getElementById('priceTooltip');
+    if (t) { t.style.opacity = '0'; t.style.transition = 'opacity 0.5s'; }
+  }, 4000);
+</script>
+</body>
+</html>
